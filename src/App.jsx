@@ -25,7 +25,16 @@ function App() {
 
       form.reset()
       reload()
-    }  
+    } 
+    
+    const removeMeal = async (id) => {
+      const result = await supabase.from("meals").delete().eq("id",id)
+      if (result.error) {
+        console.log(result.error.message)
+        return
+      }
+      reload()
+    }
 
 
     return (
@@ -42,7 +51,7 @@ function App() {
         </form>
         <p>{error}</p>
         
-        {data.map((meal) => <MealCard key={meal.id} meal={meal} />)}
+        {data.map((meal) => <MealCard key={meal.id} meal={meal} onRemove={removeMeal} />)}
         
       </div> 
 
