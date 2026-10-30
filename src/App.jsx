@@ -1,31 +1,48 @@
-import { useState } from 'react'
+import useTable from './useTable.js'
 import { supabase } from './utils/supabase'
 import MealCard from './MealCard.jsx'
 import './App.css'
 import '@picocss/pico'
 
 function App() {
-   const [meals, setMeals] = useState([])
+   const { data, error, reload } = useTable("meals")
    
-   const loadMeals = async () => {
-      const { data, error } = await supabase.from("meals").select()
-      
-         if (error) {
-           console.log(error.message)
-           return
-         }
+   const addMeal = async (event) => {
+      event.preventDefault()
+      const form = event.target
+      const meal = {
+        meal_name: form.mealName.value,
+        guest_name: form.guestName.value,
+        serves: Number(form.serves.value),
 
-         
-         setMeals(data)
       }
+
+      const result = await supabase.from("meals").insert(meal)
+      if (result.error) {
+        console.log(result.error.message)
+        return
+      } 
+
+      form.reset()
+      reload()
+    }  
+
 
     return (
 
       <div className = "container">
 
         <h1>Potluck</h1>
-        <button onClick={loadMeals}>Load</button>
-        {meals.map((meal) => <MealCard key={meal.id} meal={meal} />)}
+        
+        <form onSubmit={addMeal}>
+          <input name="mealName" placeholder="Dish" />
+          <input name="guestName" placeholder="Your name" />
+          <input name="serves" type="number" placeholder="Serves" />
+          <button>Add</button>
+        </form>
+        <p>{error}</p>
+        
+        {data.map((meal) => <MealCard key={meal.id} meal={meal} />)}
         
       </div> 
 
