@@ -1,122 +1,71 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
+import useTable from './useTable.js'
+import { supabase } from './utils/supabase'
+import MealCard from './MealCard.jsx'
+import Header from './Header.jsx'
+import Hero from './Hero.jsx'
+import Footer from './Footer.jsx'
 import './App.css'
+import '@picocss/pico'
 
 function App() {
-  const [count, setCount] = useState(0)
+   const { data, error, reload } = useTable("meals")
+   
+   const addMeal = async (event) => {
+      event.preventDefault()
+      const form = event.target
+      const meal = {
+        meal_name: form.mealName.value,
+        guest_name: form.guestName.value,
+        serves: Number(form.serves.value),
 
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      }
 
-      <div className="ticks"></div>
+      const result = await supabase.from("meals").insert(meal)
+      if (result.error) {
+        console.log(result.error.message)
+        return
+      } 
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      form.reset()
+      reload()
+    } 
+    
+    const removeMeal = async (id) => {
+      const result = await supabase.from("meals").delete().eq("id",id)
+      if (result.error) {
+        console.log(result.error.message)
+        return
+      }
+      reload()
+    }
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+
+    return (
+
+      <div className = "container">
+        <Header/>
+        <Hero/>
+
+        <h1>Potluck</h1>
+        <p><strong>Please fill out form below if you're coming to dinner.</strong></p>
+        
+        <form onSubmit={addMeal}>
+          <input name="mealName" placeholder="Dish" />
+          <input name="guestName" placeholder="Your name" />
+          <input name="serves" type="number" placeholder="Serves" />
+          <button>Add</button>
+        </form>
+        <p>{error}</p>
+        
+        {data.map((meal) => <MealCard key={meal.id} meal={meal} onRemove={removeMeal} />)}
+
+
+        <Footer/>
+        
+      </div> 
+
+    )
 }
-
-export default App
+          
+                
+   export default App         
