@@ -6,7 +6,10 @@ A react project that uses Supabase and creates a meals table.
 
 | Components | What it shows | Where its values come from | What Supabase shows | Events that change it |
 | --- | --- | --- | --- | --- |
-
+| `Header` | my name | typed into JSX | --- | ---|
+| `Footer` | copyright and current year | the year the page is opened | --- | --- |
+| `Hero` | my hero Photo | heroPhoto, which calls imageURL | --- | --- |
+| `MealCard` | meal name, guest name | typed into Supabase and user input | 'meal_name', 'guest_name', and 'serves' |  'Add' and 'Remove' event buttons |
 
 ## Built with
 
