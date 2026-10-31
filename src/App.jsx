@@ -1,6 +1,9 @@
 import useTable from './useTable.js'
 import { supabase } from './utils/supabase'
 import MealCard from './MealCard.jsx'
+import Header from './Header.jsx'
+import Hero from './Hero.jsx'
+import Footer from './Footer.jsx'
 import './App.css'
 import '@picocss/pico'
 
@@ -40,8 +43,11 @@ function App() {
     return (
 
       <div className = "container">
+        <Header/>
+        <Hero/>
 
         <h1>Potluck</h1>
+        <p><strong>Please fill out form below if you're coming to dinner.</strong></p>
         
         <form onSubmit={addMeal}>
           <input name="mealName" placeholder="Dish" />
@@ -52,6 +58,9 @@ function App() {
         <p>{error}</p>
         
         {data.map((meal) => <MealCard key={meal.id} meal={meal} onRemove={removeMeal} />)}
+
+
+        <Footer/>
         
       </div> 
 
